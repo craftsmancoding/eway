@@ -128,7 +128,7 @@ $builder->putVehicle($vehicle);
 
 // Create Chunks
 $Chunk = $modx->newObject('modChunk');
-$Snippet->fromArray(array(
+$Chunk->fromArray(array(
     'name' => 'eway_error',
     'description' => 'Formatting Chunk for Eway errors. <strong>DO NOT MODIFY</strong>. Please make a copy of this Chunk and reference it in your &errorTpl parameter',
     'snippet' => file_get_contents('../core/components/eway/elements/chunks/eway_error.html'),
@@ -156,7 +156,7 @@ $builder->putVehicle($vehicle);
 
 
 $Chunk = $modx->newObject('modChunk');
-$Snippet->fromArray(array(
+$Chunk->fromArray(array(
     'name' => 'eway_error',
     'description' => 'Sample Eway Form. <strong>DO NOT MODIFY</strong>. Please make a copy of this Chunk.',
     'snippet' => file_get_contents('../core/components/eway/elements/chunks/eway_sample_form.html'),
@@ -184,7 +184,7 @@ $builder->putVehicle($vehicle);
 
 
 $Chunk = $modx->newObject('modChunk');
-$Snippet->fromArray(array(
+$Chunk->fromArray(array(
     'name' => 'eway_success',
     'description' => 'Formatting Chunk for Eway success messages. <strong>DO NOT MODIFY</strong>. Please make a copy of this Chunk and reference it in your &successTpl parameter',
     'snippet' => file_get_contents('../core/components/eway/elements/chunks/eway_success.html'),
@@ -214,9 +214,9 @@ $builder->putVehicle($vehicle);
 
 /* now pack in the license file, readme and setup options */
 $builder->setPackageAttributes(array(
-    'license' => file_get_contents(MODX_ASSETS_PATH .'components/'.PKG_NAME_LOWER.'/docs/license.txt'),
-    'readme' => file_get_contents(MODX_ASSETS_PATH .'components/'.PKG_NAME_LOWER.'/docs/readme.txt'),
-    'changelog' => file_get_contents(MODX_ASSETS_PATH .'components/'.PKG_NAME_LOWER.'/docs/changelog.txt'),
+    'license' => file_get_contents(MODX_ASSETS_PATH .'components/'.PKG_NAME_LOWER.'/core/components/'.PKG_NAME_LOWER.'/docs/license.txt'),
+    'readme' => file_get_contents(MODX_ASSETS_PATH .'components/'.PKG_NAME_LOWER.'/core/components/'.PKG_NAME_LOWER.'/docs/readme.txt'),
+    'changelog' => file_get_contents(MODX_ASSETS_PATH .'components/'.PKG_NAME_LOWER.'/core/components/'.PKG_NAME_LOWER.'/docs/changelog.txt'),
 //    'setup-options' => array(
 //        'source' => MODX_ASSETS_PATH .'components/docs/user.input.html',
 //   ),
