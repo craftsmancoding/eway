@@ -77,6 +77,7 @@ $Snippet->fromArray(array(
     'name' => 'EwaySharedPayments',
     'description' => '<strong>Version '.PKG_VERSION.'-'.PKG_RELEASE.'</strong> Integrates the Eway Shared Payments API',
     'snippet' => file_get_contents('../core/components/eway/elements/snippets/snippet.EwaySharedPayments.php'),
+    'category' => '',
 ));
 
 
@@ -132,6 +133,7 @@ $Chunk->fromArray(array(
     'name' => 'eway_error',
     'description' => 'Formatting Chunk for Eway errors. <strong>DO NOT MODIFY</strong>. Please make a copy of this Chunk and reference it in your &errorTpl parameter',
     'snippet' => file_get_contents('../core/components/eway/elements/chunks/eway_error.html'),
+    'category' => '',
 ));
 
 $Chunk->addOne($Category);
@@ -157,9 +159,10 @@ $builder->putVehicle($vehicle);
 
 $Chunk = $modx->newObject('modChunk');
 $Chunk->fromArray(array(
-    'name' => 'eway_error',
+    'name' => 'eway_sample_form',
     'description' => 'Sample Eway Form. <strong>DO NOT MODIFY</strong>. Please make a copy of this Chunk.',
     'snippet' => file_get_contents('../core/components/eway/elements/chunks/eway_sample_form.html'),
+    'category' => '',
 ));
 
 $Chunk->addOne($Category);
@@ -188,6 +191,7 @@ $Chunk->fromArray(array(
     'name' => 'eway_success',
     'description' => 'Formatting Chunk for Eway success messages. <strong>DO NOT MODIFY</strong>. Please make a copy of this Chunk and reference it in your &successTpl parameter',
     'snippet' => file_get_contents('../core/components/eway/elements/chunks/eway_success.html'),
+    'category' => '',
 ));
 
 $Chunk->addOne($Category);
