@@ -88,7 +88,7 @@ if (!function_exists('curl_exec')) {
 $modx->getService('lexicon', 'modLexicon');
 $modx->lexicon->load('eway_shared:default');
 
-require_once MODX_CORE_PATH.'components/eway_shared/includes/Eway.php';
+require_once MODX_CORE_PATH.'components/eway/includes/Eway.php';
 
 if (isset($test)) {
 	$CustomerID = 87654321; // testing account.

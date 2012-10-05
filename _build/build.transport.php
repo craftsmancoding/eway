@@ -123,6 +123,13 @@ $Setting->fromArray(array(
     'namespace' => 'eway',
     'area' => 'default',
 ),'',true,true);
+
+$attributes = array(
+	xPDOTransport::UNIQUE_KEY => 'key',
+	xPDOTransport::PRESERVE_KEYS => false,
+	xPDOTransport::UPDATE_OBJECT => true,	
+);
+
 $vehicle = $builder->createVehicle($Setting, $attributes);
 $builder->putVehicle($vehicle);
 
