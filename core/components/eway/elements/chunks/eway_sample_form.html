@@ -1,0 +1,195 @@
+<style>
+
+</style>
+
+<div style="1px solid gray; background-color:#E0E0E0; padding:10px; margin: 10px; border-radius: 5px; width:500px;">
+	<p>This is a sample form only!  If you are going to modify it, <strong>make a copy first!</strong> 
+	When this plugin is updated, the contents of this Chunk may be overwritten, so use your own copy!</p>
+</div>
+
+<form method="post" action="[[~[[*id]]]]" id="eway_sample_form">
+    <div class="secondaryheading">
+    	<img src="[[++assets_url]]components/eway/ewaylogo.png" alt="Eway-Logo" />
+    	<br /><b>&nbsp;&nbsp;Online payments made easy!</b>
+    </div>
+        
+      <div id="formmiddle" class="middle_query">
+            <div class="secondaryheading">
+                <h3>Merchant Details</h3>
+            </div>
+            
+            <div class="row">
+                <span class="label">CustomerId: </span> <span style="margin-left: 20px;">
+                    <span>******</span>
+                </span>
+                <p class="instruction">Set the Eway Customer ID in your System Settings.</p>
+            </div>
+            <div class="row">
+                <span class="label">UserName: </span> <span style="margin-left: 20px;">
+                    <input type="text" name="UserName" value="TestAccount" />
+					<p class="instruction">* For testing, the value must be "TestAccount"</p>
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">Company Name: </span><span class="formw">
+                    <input type="text" name="CompanyName" value="" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">Currency: </span><span style="margin-left: 20px;">
+                    <input type="text" name="Currency" value="AUD" />
+                </span>
+                
+				<p class="instruction">* Any 3-letter currency code defined by in <a href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a> is viable.  Eway customers would need to get a multi-currency Internet Merchant Facility with NAB and show why they wanted to accept payments in those currencies but there should be no problem in terms of implementation with eWAY.</p>
+
+            </div>
+            <div class="row">
+                <span class="label">PageTitle: </span>
+                <span class="formw">
+                    <input type="text" name="PageTitle" value="" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">PageDescription: </span>
+                <span class="formw">
+                    <input type="text" name="PageDescription" value="" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">PageFooter: </span>
+                <span class="formw">
+                    <input type="text" name="PageFooter" value="" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">CompanyLogo: </span>
+                <span class="formw">
+                    <input type="text" name="CompanyLogo" value="" />
+                </span>            
+            </div>	
+            <div class="row">
+                <span class="label">PageBanner: </span>
+                <span class="formw">
+                    <input type="text" name="PageBanner" value="" />
+                </span>            
+            </div>				
+            <div class="row">
+                <span class="label">Language: </span>
+                <span style="margin-left: 20px;">
+	                <select name="Language">
+		                <option selected="selected" value="EN">English</option>
+		                <option value="FR">French</option>
+		                <option value="DE">German</option>
+		                <option value="ES">Spanish</option>
+		                <option value="NL">Dutch</option>
+	                </select>
+                </span>            
+                <p class="instruction">* Currently, the only languages supported are EN, FR, DE, ES, and NL.</p>
+            </div>
+            
+            <div class="secondaryheading">
+                <h3>Customer Details</h3>
+            </div>
+            <div class="row">
+                <span class="label">First Name: </span>
+            	<span style="margin-left: 20px;">
+                	<input type="text" name="CustomerFirstName" value="[[+modx.user.id:userinfo=`fullname`]]" />
+            	</span>
+            </div>
+            
+            <div class="row">
+                <span class="label">Last Name: </span>
+                <span style="margin-left: 20px;">
+                    <input type="text" name="CustomerLastName" value="" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">Address: </span>
+                <span style="margin-left: 20px;">
+                    <input type="text" name="CustomerAddress" value="[[+modx.user.id:userinfo=`address`]]" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">City: </span>
+                <span style="margin-left: 20px;">
+                    <input type="text" name="CustomerCity" value="[[+modx.user.id:userinfo=`city`]]" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">State: </span>
+                <span style="margin-left: 20px;">
+                    <input type="text" name="CustomerState" value="[[+modx.user.id:userinfo=`state`]]" />
+                </span>
+            </div>
+            <div class="row">
+                <span class="label">Country: </span>
+                <span style="margin-left: 20px;">
+                    <input type="test" name="CustomerCountry" value="[[+modx.user.id:userinfo=`country`]]" />
+                </span>
+                <p class="instruction">This is info to be displayed on the payment page, so full names or abbreviations are fine.</p>
+            </div>
+            <div class="row">
+                <span class="label">Postcode: </span>
+                <span style="margin-left: 20px;">
+                    <input type="text" name="CustomerPostCode" value="[[+modx.user.id:userinfo=`zip`]]" />
+                </span>
+            </div>
+            <div class="row">
+                <span class="label">Email: </span>
+                <span style="margin-left: 20px;">
+                    <input type="text" name="CustomerEmail" value="[[+modx.user.id:userinfo=`email`]]" />
+                </span>
+            </div>
+            <div class="row">
+                <span class="label">Customer Phone: </span>
+                <span style="margin-left: 20px;">
+                    <input type="text" name="CustomerPhone" value="[[+modx.user.id:userinfo=`phone`]]" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">Modifiable Details: </span>
+                <span style="margin-left: 20px;">
+	                <select name="ModDetails">
+		                <option selected="selected" value="false">Readonly</option>
+		                <option value="true">Changable</option>
+	                </select>
+                </span>            
+            </div>
+
+            <div class="secondaryheading">
+                <h3>Invoice Details</h3>
+            </div>
+            
+            <div class="row">
+                <span class="label">Merchant Reference Number: </span>
+                <span class="formw"> 
+            	    <input type="text" name="RefNum" value="" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">Merchant Invoice: </span>
+                <span class="formw">
+                    <input type="text" name="Invoice" value="" />
+                </span>            
+            </div>
+            <div class="row">
+                <span class="label">Amount: </span>
+                <span style="margin-left: 20px;">
+		            <select name="Amount">
+		            	<option selected="selected" value="10.00">10.00</option>
+		            	<option value="80.55">80.55</option>
+		            </select>                        
+                </span>            
+                <p>* Test transactions must use an amount of 10.00</p>
+            </div>
+            <div class="row">
+                <span class="label">Invoice Description: </span>
+                <span class="formw">
+                    <input type="text" name="InvoiceDescription" value="" />
+                </span>            
+            </div>
+
+			<input value="Checkout" id="Checkout" type="submit" />
+			
+        </div>
+</form>
