@@ -124,17 +124,17 @@ if (!isset($css) || empty($css)) {
 }
 
 if (!isset($returnID) || empty($returnID)) {
-	$returnID = $modx->makeUrl($modx->resource->get('id'), '', '', 'full');
+	$ReturnUrl = $modx->makeUrl($modx->resource->get('id'), '', '', 'full');
 }
 else {
-	$returnID = $modx->makeUrl($returnID, '', '', 'full');
+	$ReturnUrl = $modx->makeUrl($returnID, '', '', 'full');
 }
 
 if (!isset($cancelID) || empty($cancelID)) {
-	$cancelID = $modx->makeUrl($modx->resource->get('id'), '', '', 'full');
+	$CancelUrl = $modx->makeUrl($modx->resource->get('id'), '', '', 'full');
 }
 else {
-	$cancelID = $modx->makeUrl($cancelID, '', '', 'full');
+	$CancelUrl = $modx->makeUrl($cancelID, '', '', 'full');
 }
 
 $modx->log(xPDO::LOG_LEVEL_DEBUG, 'EwaySharedPayments Snippet called with the following arguments: ' .print_r($scriptProperties, true));
@@ -174,8 +174,8 @@ if (!empty($_POST)) {
 	$ewayurl.="&CustomerEmail=".Eway::get($scriptProperties, $_POST, 'CustomerEmail');
 	$ewayurl.="&CustomerPhone=".Eway::get($scriptProperties, $_POST, 'CustomerPhone');
 	$ewayurl.="&InvoiceDescription=".Eway::get($scriptProperties, $_POST, 'InvoiceDescription');
-	$ewayurl.="&CancelURL=".$cancelUrl;
-	$ewayurl.="&ReturnUrl=".$returnUrl;
+	$ewayurl.="&CancelURL=".$CancelUrl;
+	$ewayurl.="&ReturnUrl=".$ReturnUrl;
 	$ewayurl.="&CompanyLogo=".Eway::get($scriptProperties, $_POST, 'CompanyLogo');
 	$ewayurl.="&PageBanner=".Eway::get($scriptProperties, $_POST, 'PageBanner');
 	$ewayurl.="&MerchantReference=".Eway::get($scriptProperties, $_POST, 'RefNum');
