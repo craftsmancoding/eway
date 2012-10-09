@@ -30,6 +30,14 @@
  *
  * &CustomerID string usually set via a System Setting, but you can also set it in-line.
  *
+ * &successTpl string name of Chunk to use to format a success message. All parameters are 
+ * 		available as placeholders, as well as a [[+msg]] placeholder.
+ *
+ * &errorTpl string name of Chunk to use to format an error message. [[+msg]] will contain
+ *		the error message.
+ *
+ * &successHook string name of a Snippet to execute after successful submission of the form.
+ *
  * Also, any of the following parameters can be passed either via the $_POST'ed form fields
  * or by setting them explicitly in the Snippet call:
  * CustomerID, UserName, Amount, Currency, PageTitle, PageDescription, PageFooter, Language,
@@ -40,7 +48,8 @@
  *
  * Values set in the Snippet call will override any values set in the $_POST.
  * The process is more tamper-proof when you set values in the Snippet call.
- *
+ * All sumitted parameters are stored in the $_SESSION array (see print_r($_SESSION['eway'])
+ * for use in the 
  *
  * USAGE:
  *
@@ -86,7 +95,7 @@ if (!function_exists('curl_exec')) {
 }
 
 $modx->getService('lexicon', 'modLexicon');
-$modx->lexicon->load('eway_shared:default');
+$modx->lexicon->load('eway:default');
 
 require_once MODX_CORE_PATH.'components/eway/includes/Eway.php';
 
@@ -119,7 +128,7 @@ if (empty($CustomerID)) {
 	return $modx->getChunk($errorTpl, $props);
 }
 
-if (!isset($css) || empty($css)) {
+if (isset($css) || !empty($css)) {
 	$modx->regClientCSS($css);
 }
 
@@ -144,13 +153,20 @@ if (!empty($_POST)) {
 	// If the current page containing the EwaySharedPayments is acting as the returnUrl,
 	// we handle Eway's post-back and 'AccessPaymentCode'
 	if (isset($_POST['AccessPaymentCode'])) {
+
 		// some data sanitization.
 		$AccessPaymentCode = preg_replace('/[^A-Za-z0-9]/', '*', $_POST['AccessPaymentCode']);
 		$modx->log(xPDO::LOG_LEVEL_DEBUG, 'EwaySharedPayments post-back with AccessPaymentCode '.$AccessPaymentCode);
-		$props = array(
-			'title' => $modx->lexicon('success'),
-			'msg' => $modx->lexicon('eway.success', array('AccessPaymentCode'=> $AccessPaymentCode))
-		);
+		$props = $_SESSION['eway'];
+		$props['title'] = $modx->lexicon('success');
+		$props['msg'] = $modx->lexicon('eway.success', array('AccessPaymentCode'=> $AccessPaymentCode));
+
+		$keys = array_keys($props);
+		$props['help'] = implode(',',$keys);
+		// Hook
+		if (isset($successHook) && !empty($successHook)) {
+			$modx->runSnippet($successHook, $props);
+		}
 		return $modx->getChunk($successTpl, $props);
 
 	}
@@ -185,6 +201,13 @@ if (!empty($_POST)) {
 	$ewayurl.="&MerchantOption3=".Eway::get($scriptProperties, $_POST, 'MerchantOption3');
 	$ewayurl.="&ModifiableCustomerDetails=".Eway::get($scriptProperties, $_POST, 'ModDetails');
 
+	// Store to Session for later use
+	$save_me = array_merge($_POST,$scriptProperties);
+	$save_me['CancelURL'] = $CancelUrl;
+	$save_me['ReturnUrl'] = $ReturnUrl;
+	$save_me['CustomerID'] = $CustomerID;
+	$_SESSION['eway'] = $save_me;
+	
 	$spacereplace = str_replace(" ", "%20", $ewayurl);
 	$posturl="https://au.ewaygateway.com/Request/$spacereplace";
 
