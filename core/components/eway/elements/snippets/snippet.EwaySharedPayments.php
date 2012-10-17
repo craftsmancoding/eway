@@ -165,7 +165,12 @@ if (!empty($_POST)) {
 		$props['help'] = implode(',',$keys);
 		// Hook
 		if (isset($successHook) && !empty($successHook)) {
-			$modx->runSnippet($successHook, $props);
+			$snippet_list = explode(',',$successHook);
+			foreach ($snippet_list as $s) {
+				$modx->runSnippet($s, $props);
+			}
+			
+
 		}
 		return $modx->getChunk($successTpl, $props);
 
@@ -206,7 +211,9 @@ if (!empty($_POST)) {
 	$save_me['CancelURL'] = $CancelUrl;
 	$save_me['ReturnUrl'] = $ReturnUrl;
 	$save_me['CustomerID'] = $CustomerID;
+    $save_me['posted_data'] = $_POST;
 	$_SESSION['eway'] = $save_me;
+        
 	
 	$spacereplace = str_replace(" ", "%20", $ewayurl);
 	$posturl="https://au.ewaygateway.com/Request/$spacereplace";
