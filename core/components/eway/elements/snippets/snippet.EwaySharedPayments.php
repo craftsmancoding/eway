@@ -31,12 +31,16 @@
  * &CustomerID string usually set via a System Setting, but you can also set it in-line.
  *
  * &successTpl string name of Chunk to use to format a success message. All parameters are 
- * 		available as placeholders, as well as a [[+msg]] placeholder.
+ * 		available as placeholders, as well as a [[+msg]] placeholder.  Set to blank if you 
+ *		do not want any success message displayed.
  *
  * &errorTpl string name of Chunk to use to format an error message. [[+msg]] will contain
  *		the error message.
  *
- * &successHook string name of a Snippet to execute after successful submission of the form.
+ * &successHook string comma-separated name(s) of Snippet(s) to execute after successful submission 
+ *		of the form.  If you are redirecting to a different thank-you page via &returnID, then
+ * 		you must call this snippet on that page.  These snippets are executed ONLY after 
+ *		returning from Eway.
  *
  * Also, any of the following parameters can be passed either via the $_POST'ed form fields
  * or by setting them explicitly in the Snippet call:
@@ -83,7 +87,6 @@
  * @author Everett Griffiths <everett@craftsmancoding.com>
  * @package eway
  */
-
 
 // Basic testing... bail if we don't have cUrl installed.
 if (!function_exists('curl_exec')) {
@@ -137,6 +140,10 @@ if (!isset($returnID) || empty($returnID)) {
 }
 else {
 	$ReturnUrl = $modx->makeUrl($returnID, '', '', 'full');
+	// Check to ensure no successHook snippets used!
+	if (isset($successHook) && !empty($successHook)) {
+		$modx->log(xPDO::LOG_LEVEL_DEBUG, 'EwaySharedPayments Snippet called unusable &successHook argument! You should only use the &successHook argument on the "Thank You" page!');	
+	}
 }
 
 if (!isset($cancelID) || empty($cancelID)) {
@@ -146,14 +153,17 @@ else {
 	$CancelUrl = $modx->makeUrl($cancelID, '', '', 'full');
 }
 
+
+
 $modx->log(xPDO::LOG_LEVEL_DEBUG, 'EwaySharedPayments Snippet called with the following arguments: ' .print_r($scriptProperties, true));
 
 // Process Payment
 if (!empty($_POST)) {
+	
 	// If the current page containing the EwaySharedPayments is acting as the returnUrl,
 	// we handle Eway's post-back and 'AccessPaymentCode'
 	if (isset($_POST['AccessPaymentCode'])) {
-
+		
 		// some data sanitization.
 		$AccessPaymentCode = preg_replace('/[^A-Za-z0-9]/', '*', $_POST['AccessPaymentCode']);
 		$modx->log(xPDO::LOG_LEVEL_DEBUG, 'EwaySharedPayments post-back with AccessPaymentCode '.$AccessPaymentCode);
@@ -163,18 +173,28 @@ if (!empty($_POST)) {
 
 		$keys = array_keys($props);
 		$props['help'] = implode(',',$keys);
+
 		// Hook
-		if (isset($successHook) && !empty($successHook)) {
+		if (isset($successHook) && !empty($successHook)) {		
 			$snippet_list = explode(',',$successHook);
 			foreach ($snippet_list as $s) {
+				$s = trim($s);
+				$modx->log(xPDO::LOG_LEVEL_ERROR,'eway_transaction: calling hook '.$s);
 				$modx->runSnippet($s, $props);
-			}
-			
+			}		
 
 		}
-		return $modx->getChunk($successTpl, $props);
+		// Allow for empty messages...
+		if (!empty($successTpl)) {
+			return $modx->getChunk($successTpl, $props);
+		}
+		else {
+			return '';
+		}
+		
 
 	}
+
 	// Otherwise, it's a regular form submission.
 	$ewayurl.='?CustomerID='.$CustomerID;
 	$ewayurl.="&UserName=".Eway::get($scriptProperties, $_POST, 'UserName');
@@ -211,7 +231,7 @@ if (!empty($_POST)) {
 	$save_me['CancelURL'] = $CancelUrl;
 	$save_me['ReturnUrl'] = $ReturnUrl;
 	$save_me['CustomerID'] = $CustomerID;
-    $save_me['posted_data'] = $_POST;
+        $save_me['posted_data'] = $_POST;
 	$_SESSION['eway'] = $save_me;
         
 	
