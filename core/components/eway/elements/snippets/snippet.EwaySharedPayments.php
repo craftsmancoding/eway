@@ -13,8 +13,8 @@
  *
  * SNIPPET PARAMETERS:
  *
- * &returnID integer (optional) the pageID to redirect after the transaction is completed.
- *   Default is the current page.
+ * &returnID integer (optional) the pageID to redirect after the transaction is completed,
+ *   i.e. the "Thank You" page. Default is the current page.
  *
  * &cancelID integer (optional) the pageID to redirect to if the transaction is cancelled
  *  Default is the current page.
@@ -78,6 +78,16 @@
  *
  * [[!EwaySharedPayments? &CustomerPhone=`001 123 4567` &Language=`DE`]]
  *
+ * Using a Thank You Page:
+ * You could put custom Snippets onto your Thank You page and read data from the Eway post-back and from
+ * the settings stored in the $_SESSION array, or you can put another instance of this Snippet on the Thank
+ * you page and reference snippets via the &successHook -- each snippet called will receive as parameters 
+ * all the data filled out on the initial form, as well as the post-back AccessPaymentCode.  In such 
+ * cases you may want to hide the success messagae by blanking out the successTpl argument.
+ *
+ * On the thank you page: 
+ *
+ * [[!EwaySharedPayments? &successHook=`store_to_database` &successTpl=``]]
  *
  * @var modX $modx
  * @var array $scriptProperties
@@ -88,19 +98,25 @@
  * @package eway
  */
 
+require_once MODX_CORE_PATH.'components/eway/includes/Eway.php'; 
+$modx->getService('lexicon', 'modLexicon');
+$modx->lexicon->load('eway:default');
+
 // Basic testing... bail if we don't have cUrl installed.
 if (!function_exists('curl_exec')) {
 	$props = array(
 		'title' => $modx->lexicon('error'),
 		'msg' => $modx->lexicon('eway.missing_curl')
 	);
+	$modx->log(xPDO::LOG_LEVEL_ERROR, 'EwaySharedPayments Snippet:'.$modx->lexicon('eway.missing_curl'));
 	return $modx->getChunk($errorTpl, $props);
 }
 
-$modx->getService('lexicon', 'modLexicon');
-$modx->lexicon->load('eway:default');
+// Test Session settings
+if ($modx->getOption('cache_db_session') ) {
+	$modx->log(xPDO::LOG_LEVEL_ERROR, 'EwaySharedPayments Snippet:'.$modx->lexicon('eway.cache_db_session'));
+}
 
-require_once MODX_CORE_PATH.'components/eway/includes/Eway.php';
 
 if (isset($test)) {
 	$CustomerID = 87654321; // testing account.
@@ -142,7 +158,7 @@ else {
 	$ReturnUrl = $modx->makeUrl($returnID, '', '', 'full');
 	// Check to ensure no successHook snippets used!
 	if (isset($successHook) && !empty($successHook)) {
-		$modx->log(xPDO::LOG_LEVEL_DEBUG, 'EwaySharedPayments Snippet called unusable &successHook argument! You should only use the &successHook argument on the "Thank You" page!');	
+		$modx->log(xPDO::LOG_LEVEL_ERROR, 'EwaySharedPayments Snippet called unusable &successHook argument! You should only use the &successHook argument on the "Thank You" page!');
 	}
 }
 
@@ -167,23 +183,25 @@ if (!empty($_POST)) {
 		// some data sanitization.
 		$AccessPaymentCode = preg_replace('/[^A-Za-z0-9]/', '*', $_POST['AccessPaymentCode']);
 		$modx->log(xPDO::LOG_LEVEL_DEBUG, 'EwaySharedPayments post-back with AccessPaymentCode '.$AccessPaymentCode);
+
 		$props = $_SESSION['eway'];
 		$props['title'] = $modx->lexicon('success');
-		$props['msg'] = $modx->lexicon('eway.success', array('AccessPaymentCode'=> $AccessPaymentCode));
-
-		$keys = array_keys($props);
-		$props['help'] = implode(',',$keys);
+		$props['msg'] = $modx->lexicon('eway.success', array('AccessPaymentCode'=> $AccessPaymentCode));	
 
 		// Hook
 		if (isset($successHook) && !empty($successHook)) {		
 			$snippet_list = explode(',',$successHook);
 			foreach ($snippet_list as $s) {
 				$s = trim($s);
-				$modx->log(xPDO::LOG_LEVEL_ERROR,'eway_transaction: calling hook '.$s);
+				$modx->log(xPDO::LOG_LEVEL_DEBUG,'eway_transaction: calling hook '.$s);
+				$props = $_SESSION['eway'];
+				if (!is_array($props)) {
+					$props = array();
+				}
 				$modx->runSnippet($s, $props);
-			}		
-
+			}
 		}
+		
 		// Allow for empty messages...
 		if (!empty($successTpl)) {
 			return $modx->getChunk($successTpl, $props);
@@ -191,8 +209,6 @@ if (!empty($_POST)) {
 		else {
 			return '';
 		}
-		
-
 	}
 
 	// Otherwise, it's a regular form submission.
@@ -219,7 +235,7 @@ if (!empty($_POST)) {
 	$ewayurl.="&ReturnUrl=".$ReturnUrl;
 	$ewayurl.="&CompanyLogo=".Eway::get($scriptProperties, $_POST, 'CompanyLogo');
 	$ewayurl.="&PageBanner=".Eway::get($scriptProperties, $_POST, 'PageBanner');
-	$ewayurl.="&MerchantReference=".Eway::get($scriptProperties, $_POST, 'RefNum');
+	$ewayurl.="&MerchantReference=".Eway::get($scriptProperties, $_POST, 'MerchantReference');
 	$ewayurl.="&MerchantInvoice=".Eway::get($scriptProperties, $_POST, 'MerchantInvoice');
 	$ewayurl.="&MerchantOption1=".Eway::get($scriptProperties, $_POST, 'MerchantOption1');
 	$ewayurl.="&MerchantOption2=".Eway::get($scriptProperties, $_POST, 'MerchantOption2');
@@ -231,13 +247,14 @@ if (!empty($_POST)) {
 	$save_me['CancelURL'] = $CancelUrl;
 	$save_me['ReturnUrl'] = $ReturnUrl;
 	$save_me['CustomerID'] = $CustomerID;
-        $save_me['posted_data'] = $_POST;
+    $save_me['posted_data'] = $_POST;
 	$_SESSION['eway'] = $save_me;
+	$modx->log(xPDO::LOG_LEVEL_DEBUG, 'EwaySharedPayments storing the following session vars: ' .print_r($save_me, true));
         
-	
-	$spacereplace = str_replace(" ", "%20", $ewayurl);
+	$spacereplace = str_replace(' ', '%20', $ewayurl);
 	$posturl="https://au.ewaygateway.com/Request/$spacereplace";
-
+	$modx->log(xPDO::LOG_LEVEL_DEBUG, 'EwaySharedPayments is posting to the following URL: ' .$posturl);
+	
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $posturl);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -259,7 +276,7 @@ if (!empty($_POST)) {
 	// Redirect
 	if ($responsemode == 'True') {
 		$modx->log(xPDO::LOG_LEVEL_DEBUG, 'Forwarding to '.$responseurl);
-		header("location: ".$responseurl);
+		header("Location: ".$responseurl);
 		exit;
 	}
 	// Or Error
@@ -271,9 +288,7 @@ if (!empty($_POST)) {
 		);
 
 		return $modx->getChunk($errorTpl, $props);
-
 	}
-
 }
 
-/*EOF*/
+/*EOF*/;

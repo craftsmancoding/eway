@@ -40,6 +40,7 @@ $_lang['eway.success'] = 'You have successfully completed your transaction.  You
 $_lang['error'] = 'Error';
 $_lang['success'] = 'Success';
 
-$_lange['eway.missing_curl'] = 'PHP was compiled without support for cUrl! Please speak to your system administrator about correcting this problem';
+$_lang['eway.missing_curl'] = 'PHP was compiled without support for cUrl! Please speak to your system administrator about correcting this problem';
 
+$_lang['eway.cache_db_session'] = 'The cache_db_session System Setting is enabled: this can cause erratic behavior for any Snippets (e.g. those referenced by &successHook) because the transaction details stored in the $_SESSION array are cached.';
 /*EOF*/
